@@ -1,0 +1,17 @@
+.git/
+.worktrees/
+__pycache__/
+*.pyc
+node_modules/
+.venv/
+cockpit-web/node_modules/
+cockpit-web/dist/
+ai-agents/.venv/
+ai-agents/tests/
+ai-agents/.envrc
+ai-agents/.env
+docs/
+*.md
+!ai-agents/README.md
+.env
+.envrc

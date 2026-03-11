@@ -1,0 +1,49 @@
+# config/scenarios.yaml
+# Scenario modifiers for the temporal simulator.
+# Scenarios adjust event generation probabilities and inject contextual events.
+
+scenarios:
+  pre-quarterly:
+    description: "2 weeks before quarterly planning — increased OKR and planning activity"
+    window_hint: 14d
+    probability_overrides:
+      okr_update: 3.0
+      status_report: 2.0
+      goal: 2.0
+    inject_events:
+      - workflow: one_on_one
+        context: "quarterly planning prep"
+        at: end
+
+  post-incident:
+    description: "Aftermath of a major incident — postmortem and recovery focus"
+    inject_events:
+      - workflow: incident
+        severity: high
+        at: start
+    probability_overrides:
+      postmortem_action: 5.0
+      coaching_note: 2.0
+      one_on_one: 1.3
+
+  first-90-days:
+    description: "New manager onboarding — observation and relationship building"
+    window_hint: 90d
+    probability_overrides:
+      one_on_one: 1.5
+      coaching_note: 0.5
+      decision: 0.3
+      feedback: 0.3
+      status_report: 0.5
+
+  review-season:
+    description: "Performance review cycle in progress"
+    window_hint: 30d
+    inject_events:
+      - workflow: review_cycle
+        status: in-progress
+        at: start
+    probability_overrides:
+      feedback: 3.0
+      one_on_one: 1.3
+      coaching_note: 1.5

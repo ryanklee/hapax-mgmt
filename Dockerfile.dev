@@ -1,0 +1,104 @@
+# ============================================================================
+# management-dev — Interactive Claude Code with management-focused configuration
+# Portable development environment: agents, axioms, hooks, skills, MCP servers
+# ============================================================================
+
+FROM node:22-slim
+
+# System tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git \
+        curl \
+        jq \
+        make \
+        ca-certificates \
+        gnupg \
+        python3 \
+        python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+# uv for Python project management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Claude Code CLI
+RUN npm install -g @anthropic-ai/claude-code
+
+# d2 diagram tool
+RUN curl -fsSL https://d2lang.com/install.sh | sh -s --
+
+# ripgrep
+RUN curl -LO https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep_14.1.1-1_amd64.deb \
+    && dpkg -i ripgrep_14.1.1-1_amd64.deb && rm ripgrep_14.1.1-1_amd64.deb
+
+# Create non-root user
+RUN useradd -m -s /bin/bash hapax
+
+# ── hapax-system (hooks, skills, agents, rules) ─────────────────────────────
+
+COPY --chown=hapax:hapax hapax-system/ /app/hapax-system/
+RUN chmod +x /app/hapax-system/hooks/scripts/*.sh
+
+# ── Claude Code config staging area ─────────────────────────────────────────
+# Staged in /app/claude-config/, copied to ~/.claude/ on first run by entrypoint.
+# This allows ~/.claude/ to be a persistent volume for conversations + plugin cache.
+
+COPY --chown=hapax:hapax claude-config/settings.json /app/claude-config/settings.json
+COPY --chown=hapax:hapax claude-config/mcp_servers.json /app/claude-config/mcp_servers.json
+COPY --chown=hapax:hapax claude-config/rules/ /app/claude-config/rules/
+
+# Custom agents → staging
+COPY --chown=hapax:hapax hapax-system/agents/ /app/claude-config/agents/
+
+# Skills → commands (flat copy from SKILL.md files)
+RUN mkdir -p /app/claude-config/commands && \
+    for d in /app/hapax-system/skills/*/; do \
+      name="$(basename "$d")"; \
+      [ -f "$d/SKILL.md" ] && cp "$d/SKILL.md" "/app/claude-config/commands/$name.md"; \
+    done
+
+# Default CLAUDE.md for when no project is mounted
+COPY --chown=hapax:hapax claude-config/CLAUDE.md /workspace/CLAUDE.md
+
+# ── Agent codebase ───────────────────────────────────────────────────────────
+
+COPY --chown=hapax:hapax ai-agents/pyproject.toml ai-agents/uv.lock ai-agents/README.md /app/ai-agents/
+COPY --chown=hapax:hapax ai-agents/agents/ /app/ai-agents/agents/
+COPY --chown=hapax:hapax ai-agents/cockpit/ /app/ai-agents/cockpit/
+COPY --chown=hapax:hapax ai-agents/shared/ /app/ai-agents/shared/
+COPY --chown=hapax:hapax ai-agents/profiles/ /app/ai-agents/profiles/
+
+# Axiom registry
+COPY --chown=hapax:hapax axioms/ /app/axioms/
+
+# Entrypoint
+COPY --chown=hapax:hapax entrypoint-dev.sh /app/entrypoint-dev.sh
+RUN chmod +x /app/entrypoint-dev.sh
+
+# Create data and workspace dirs with proper ownership
+RUN mkdir -p /data/.cache && chown -R hapax:hapax /data
+RUN mkdir -p /workspace && chown hapax:hapax /workspace
+
+# ── Switch to hapax user, then install Python deps ──────────────────────────
+
+USER hapax
+WORKDIR /app/ai-agents
+RUN uv sync --frozen --no-dev
+
+ENV HAPAX_HOME=/data
+ENV HAPAX_AGENTS_DIR=/app/ai-agents
+ENV HAPAX_SYSTEM_DIR=/app/hapax-system
+ENV HAPAX_AUDIT_DIR=/data/.cache/axiom-audit
+ENV HAPAX_CACHE_DIR=/data/.cache
+ENV QDRANT_URL=http://qdrant:6333
+ENV OLLAMA_URL=http://ollama:11434
+ENV LITELLM_API_BASE=http://litellm:4000
+ENV LANGFUSE_HOST=http://langfuse:3000
+ENV NTFY_BASE_URL=http://ntfy:8090
+
+WORKDIR /workspace
+
+ENTRYPOINT ["/app/entrypoint-dev.sh"]
+CMD ["claude"]
