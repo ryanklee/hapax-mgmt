@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+build/
+dist/
+wheels/
+*.egg-info/
+.venv/
+.venv-*/
+
+# Secrets
+.env
+.envrc
+
+# Editor / OS
+*.swp
+*.swo
+*~
+.DS_Store
+.idea/
+.vscode/settings.json
+
+# Claude Code
+.claude/settings.local.json
+.claude/agent-memory/
+
+# Profiles (generated runtime state)
+profiles/*.json
+profiles/*.md
+profiles/*.jsonl
+profiles/*.yaml
+profiles/*.bak
+profiles/*.wav
+!profiles/.gitkeep
+
+# Management data (personal, never committed)
+data/**/*.md
+data/**/*.json
+data/**/*.yaml
+!data/.gitkeep
+
+# Demo outputs
+output/
+
+# Video / Audio
+*.mp4
+*.wav
+
+# Node
+node_modules/
+dist/
+
+# Worktrees
+.worktrees/
+
+# Coverage
+.coverage
+htmlcov/
+coverage/

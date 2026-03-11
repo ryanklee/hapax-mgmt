@@ -1,0 +1,62 @@
+# axioms/registry.yaml — Axiom definitions for the hapaxromana system.
+# Schema: each axiom has id, text, weight (0-100), type (hardcoded|softcoded),
+# created date, status (active|retired), optional supersedes reference,
+# scope (constitutional|domain), and domain (null for constitutional).
+version: 3
+axioms:
+  - id: single_operator
+    text: >
+      This system is built for and operated by a single manager. All architectural
+      decisions must respect and leverage that constraint. No multi-operator features,
+      role management, sharing capabilities, or administrative interfaces.
+    weight: 100
+    type: hardcoded
+    created: "2026-03-03"
+    status: active
+    supersedes: single_user
+    scope: constitutional
+    domain:
+
+  - id: decision_support
+    text: >
+      This system supports high-stakes people management decisions. The operator's
+      time and attention are the scarcest resources. The system must minimize friction,
+      surface actionable items proactively, automate routine preparation, and never
+      require the operator to remember, check, or manually trigger what can be automated.
+    weight: 95
+    type: hardcoded
+    created: "2026-03-03"
+    status: active
+    supersedes: executive_function
+    scope: constitutional
+    domain:
+
+  - id: management_safety
+    text: >
+      This system aggregates signals and prepares context for the operator's
+      relational work with their team. It never substitutes for human judgment
+      in people decisions. LLMs prepare, humans deliver. The system surfaces
+      patterns and open loops. It never generates feedback language, coaching
+      hypotheses, or recommendations about individual team members.
+    weight: 95
+    type: hardcoded
+    created: "2026-03-03"
+    status: active
+    supersedes: management_governance
+    scope: constitutional
+    domain:
+
+  - id: corporate_boundary
+    text: >
+      The Obsidian plugin operates across a corporate network boundary via
+      Obsidian Sync. When running on employer-managed devices, all external
+      API calls must use employer-sanctioned providers (currently: OpenAI,
+      Anthropic). No localhost service dependencies may be assumed. The
+      system must degrade gracefully when home-only services are unreachable.
+    weight: 90
+    type: softcoded
+    created: "2026-03-04"
+    status: dormant
+    supersedes:
+    scope: domain
+    domain: infrastructure

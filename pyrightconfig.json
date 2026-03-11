@@ -1,0 +1,8 @@
+{
+    "include": ["agents", "shared", "cockpit"],
+    "exclude": ["tests", "**/__pycache__"],
+    "pythonVersion": "3.12",
+    "typeCheckingMode": "basic",
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": false
+}

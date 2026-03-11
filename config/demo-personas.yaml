@@ -1,0 +1,122 @@
+# Audience archetypes for demo generation.
+# The demo agent resolves natural language ("a family member", "a Senior EA") to one of these.
+
+archetypes:
+  family:
+    description: "Non-technical spouse who cares about what the system means for the operator's life, relationships, and growth"
+    tone: "Warm, uses analogies, zero jargon. Explain like showing someone your workshop."
+    vocabulary: "simple"
+    show:
+      - "The big picture FIRST — what this whole thing is, in plain terms, before any details"
+      - "An overall system diagram — how the pieces fit together at a high level"
+      - "Life organization, domain balance (work/personal/health), and goal achievement"
+      - "Understanding people and relationships — management tools that help him connect"
+      - "Executive function accommodation — how it compensates for cognitive load challenges"
+      - "How it helps at work — reducing cognitive overhead so he has energy for family"
+      - "Knowledge systems — the Obsidian notes app as external brain, how agents write briefings/prep docs into it, how it syncs across devices, how the system reads back from it (bidirectional knowledge loop)"
+      - "What the operator BUILT vs what LLMs already do — the boundary between original work and existing AI capabilities. This is critical to understand 'the work' vs 'stuff that already exists'"
+      - "Honest system maturity — under active development, showing what's built so far"
+      - "The personal creative engineering aspect — a workshop, not a product"
+    skip:
+      - "Infrastructure details (Docker, ports, services, containers)"
+      - "Technical implementation choices"
+      - "Cost data, token counts, API usage, spending metrics"
+      - "Health check scores and uptime statistics (this is background plumbing, not the point)"
+      - "System maintenance details (self-healing is background, not a feature to showcase)"
+    forbidden_terms:
+      - "API"
+      - "container"
+      - "Docker"
+      - "Qdrant"
+      - "vector"
+      - "embedding"
+      - "LiteLLM"
+      - "Langfuse"
+      - "Pydantic"
+      - "FastAPI"
+      - "systemd"
+      - "timer"
+      - "endpoint"
+      - "inference"
+      - "orchestration"
+      - "pipeline"
+      - "middleware"
+      - "schema"
+      - "microservice"
+      - "webhook"
+      - "SSE"
+      - "SDK"
+      - "CLI"
+      - "YAML"
+      - "JSON"
+      - "PostgreSQL"
+      - "pgvector"
+      - "Redis"
+      - "n8n"
+      - "Ollama"
+      - "GPU"
+      - "VRAM"
+      - "latency"
+      - "throughput"
+      - "cost"
+      - "spending"
+      - "tokens"
+      - "uptime"
+    illustration_style: "warm minimal illustration, soft gradients, approachable, human-centered, no technical elements"
+    max_scenes: 18
+
+  technical-peer:
+    description: "Fellow engineer evaluating design decisions and architecture"
+    tone: "Direct, technical vocabulary, explain the 'why' behind decisions."
+    vocabulary: "technical"
+    show:
+      - "Three-tier agent architecture"
+      - "LiteLLM routing, Qdrant vector memory, Langfuse observability"
+      - "Pydantic AI agent patterns and tool design"
+      - "Health monitoring and self-regulation"
+      - "Axiom governance system"
+      - "Code patterns and conventions"
+    skip:
+      - "Personal automations and music production"
+      - "Management domain details"
+      - "Basic explanations of common tools"
+    illustration_style: "clean precise technical illustration, dark background, geometric shapes, blueprint aesthetic, subtle glow effects"
+    max_scenes: 12
+
+  leadership:
+    description: "Enterprise architect evaluating architecture, security, and operational maturity"
+    tone: "Professional peer-to-peer. No selling, no pitching. Present architecture for honest technical review."
+    vocabulary: "enterprise"
+    show:
+      - "System topology: 13 Docker containers, service boundaries, port binding strategy"
+      - "Security posture: pass/GPG secrets, 127.0.0.1 binding, single-user threat model, no auth needed"
+      - "Observability: Langfuse v3 tracing (ClickHouse OLAP), universal instrumentation via LiteLLM"
+      - "Data architecture: Qdrant vector DB (768d nomic-embed), pgvector fallback, RAG pipeline, Obsidian vault as bidirectional knowledge layer (agents write to vault via vault_writer, RAG ingests from vault, GitDoc syncs via git)"
+      - "Model routing: LiteLLM gateway, fallback chains, local/cloud model balance, cost governance"
+      - "Agent architecture: three-tier (interactive/on-demand/autonomous), flat orchestration, stateless"
+      - "Governance: axiom system with T0 blocking implications, drift detection, constitutional constraints"
+      - "Self-regulation: health monitor (78 checks, auto-fix), scheduled maintenance, notification routing"
+      - "Operational cadence: 10 systemd timers, autonomous scheduling, multi-channel access"
+      - "Honest limitations: single-node, no HA, VRAM constraints, development maturity"
+    skip:
+      - "Music production domain"
+      - "Management domain internals (people data, 1:1 prep content)"
+      - "Basic explanations of technologies the audience already knows"
+    illustration_style: "professional business illustration, clean lines, corporate blue palette, minimal, strategic"
+    max_scenes: 18
+
+  team-member:
+    description: "Direct report who wants to understand the tool ecosystem"
+    tone: "Practical, 'here is how you would use this', relatable examples."
+    vocabulary: "professional"
+    show:
+      - "Dashboard overview and what each panel shows"
+      - "Chat interface and agent capabilities"
+      - "How agents assist with daily work"
+      - "The nudge and accommodation systems"
+    skip:
+      - "Personal data and music production"
+      - "Deep infrastructure details"
+      - "Axiom governance internals"
+    illustration_style: "friendly professional illustration, warm colors, collaborative feel, modern flat style"
+    max_scenes: 8

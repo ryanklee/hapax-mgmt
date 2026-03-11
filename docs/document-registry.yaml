@@ -1,0 +1,272 @@
+# Document Registry — hapax-mgmt
+#
+# Consumed by shared/document_registry.py and agents/drift_detector.py.
+# Defines archetypes, repo declarations, coverage rules, and mutual
+# awareness constraints for automated drift detection.
+
+version: 1
+
+# ── Archetypes ────────────────────────────────────────────────────────────────
+
+archetypes:
+  architecture:
+    description: "System design and structural documentation"
+    required_sections:
+      - "Overview"
+      - "Components"
+      - "Data Flow"
+    composite: false
+
+  operations:
+    description: "How-to and operational reference documentation"
+    required_sections:
+      - "Build, Test, and Run"
+      - "Key Files"
+    composite: true
+
+  reference:
+    description: "API and data reference documentation"
+    required_sections:
+      - "Endpoints"
+    composite: false
+
+  governance:
+    description: "Axiom definitions, implications, and enforcement rules"
+    required_sections:
+      - "Axioms"
+      - "Implications"
+    composite: false
+
+  design:
+    description: "Design documents, plans, and evaluations"
+    required_sections:
+      - "Summary"
+      - "Design"
+    composite: false
+
+# ── Repos ─────────────────────────────────────────────────────────────────────
+
+repos:
+  hapax-mgmt:
+    path: "."
+    required_docs:
+      - path: "CLAUDE.md"
+        archetype: operations
+        covers:
+          - "agents/"
+          - "cockpit/"
+          - "shared/"
+        max_stale_days: 14
+        auto_fixable: true
+
+      - path: "CLAUDE.md"
+        archetype: operations
+        covers:
+          - "agents/"
+          - "cockpit/"
+          - "shared/"
+        max_stale_days: 14
+        auto_fixable: true
+
+      - path: "README.md"
+        archetype: operations
+        covers: []
+        max_stale_days: 30
+        auto_fixable: false
+
+      - path: "agent-architecture.md"
+        archetype: architecture
+        covers:
+          - "agents/"
+          - "cockpit/engine/"
+        max_stale_days: 21
+        auto_fixable: true
+
+      - path: "operations-manual.md"
+        archetype: operations
+        covers:
+          - "agents/"
+          - "cockpit/"
+          - "scripts/"
+        max_stale_days: 21
+        auto_fixable: true
+
+      - path: "SECURITY.md"
+        archetype: reference
+        covers:
+          - "llm-stack/"
+          - "shared/config.py"
+        max_stale_days: 30
+        auto_fixable: false
+
+      - path: "docs/api-reference.md"
+        archetype: reference
+        covers:
+          - "cockpit/api/routes/"
+        max_stale_days: 14
+        auto_fixable: true
+
+      - path: "docs/data-architecture.md"
+        archetype: architecture
+        covers:
+          - "shared/"
+          - "cockpit/data/"
+          - "cockpit/engine/"
+        max_stale_days: 21
+        auto_fixable: true
+
+      - path: "docs/cross-project-boundary.md"
+        archetype: architecture
+        covers: []
+        max_stale_days: 30
+        auto_fixable: false
+
+      - path: "axioms/registry.yaml"
+        archetype: governance
+        covers:
+          - "shared/axiom_*.py"
+        max_stale_days: 30
+        auto_fixable: false
+
+      - path: "llm-stack/README.md"
+        archetype: operations
+        covers:
+          - "llm-stack/docker-compose.yml"
+        max_stale_days: 14
+        auto_fixable: true
+
+    ci_sources: {}
+
+# ── Coverage Rules ────────────────────────────────────────────────────────────
+#
+# If code in a "covers" path changes but the doc hasn't been updated within its
+# staleness window, flag it as a coverage gap.
+
+coverage_rules:
+  - ci_type: "code_change"
+    reference_doc: "CLAUDE.md"
+    reference_section: "Repository Layout"
+    match_by: "path"
+    severity: "medium"
+    description: "Root CLAUDE.md must reflect changes to agents/, cockpit/, or shared/"
+
+  - ci_type: "code_change"
+    reference_doc: "CLAUDE.md"
+    reference_section: "Project Layout"
+    match_by: "path"
+    severity: "medium"
+    description: "ai-agents CLAUDE.md must reflect changes to agents/, cockpit/, or shared/"
+
+  - ci_type: "code_change"
+    reference_doc: "agent-architecture.md"
+    reference_section: "Components"
+    match_by: "name"
+    severity: "high"
+    description: "Architecture doc must reflect agent roster and engine rule changes"
+
+  - ci_type: "code_change"
+    reference_doc: "operations-manual.md"
+    reference_section: "Agents"
+    match_by: "name"
+    severity: "medium"
+    description: "Operations manual must reflect agent additions, removals, or flag changes"
+
+  - ci_type: "code_change"
+    reference_doc: "docs/api-reference.md"
+    reference_section: "Endpoints"
+    match_by: "name"
+    severity: "high"
+    description: "API reference must reflect route additions or removals in cockpit/api/routes/"
+
+  - ci_type: "code_change"
+    reference_doc: "docs/data-architecture.md"
+    reference_section: "Data Flow"
+    match_by: "path"
+    severity: "medium"
+    description: "Data architecture must reflect changes to shared/, cockpit/data/, or cockpit/engine/"
+
+  - ci_type: "code_change"
+    reference_doc: "SECURITY.md"
+    reference_section: "Endpoints"
+    match_by: "name"
+    severity: "high"
+    description: "Security doc must reflect port or credential management changes"
+
+  - ci_type: "code_change"
+    reference_doc: "llm-stack/README.md"
+    reference_section: "Services"
+    match_by: "name"
+    severity: "medium"
+    description: "LLM stack README must reflect docker-compose service changes"
+
+  - ci_type: "code_change"
+    reference_doc: "axioms/registry.yaml"
+    reference_section: "Axioms"
+    match_by: "name"
+    severity: "high"
+    description: "Axiom registry must stay in sync with shared/axiom_*.py enforcement code"
+
+# ── Mutual Awareness ─────────────────────────────────────────────────────────
+#
+# Pairs or groups of documents that must stay consistent with each other.
+
+mutual_awareness:
+  - type: "count_consistency"
+    description: "Agent count must match between root CLAUDE.md and ai-agents CLAUDE.md"
+    docs:
+      - "CLAUDE.md"
+      - "CLAUDE.md"
+    registry_doc: "CLAUDE.md"
+    registry_section: "Agents"
+    target_phrase: "15 agents"
+    severity: "high"
+
+  - type: "count_consistency"
+    description: "Endpoint count must match between CLAUDE.md and api-reference.md"
+    docs:
+      - "CLAUDE.md"
+      - "docs/api-reference.md"
+    registry_doc: "CLAUDE.md"
+    registry_section: "API"
+    target_phrase: "endpoints"
+    severity: "high"
+
+  - type: "description_consistency"
+    description: "Project description must be consistent between CLAUDE.md and README.md"
+    docs:
+      - "CLAUDE.md"
+      - "README.md"
+    registry_doc: "CLAUDE.md"
+    registry_section: "What This Repo Is"
+    target_phrase: ""
+    severity: "medium"
+
+  - type: "roster_consistency"
+    description: "Agent roster and reactive engine rules must match between architecture and operations docs"
+    docs:
+      - "agent-architecture.md"
+      - "operations-manual.md"
+    registry_doc: "agent-architecture.md"
+    registry_section: "Components"
+    target_phrase: ""
+    severity: "high"
+
+  - type: "port_consistency"
+    description: "Port numbers must match between LLM stack README and SECURITY.md"
+    docs:
+      - "llm-stack/README.md"
+      - "SECURITY.md"
+    registry_doc: "llm-stack/README.md"
+    registry_section: "Services"
+    target_phrase: ""
+    severity: "high"
+
+  - type: "count_consistency"
+    description: "Endpoint count must match between api-reference.md and ai-agents CLAUDE.md"
+    docs:
+      - "docs/api-reference.md"
+      - "CLAUDE.md"
+    registry_doc: "CLAUDE.md"
+    registry_section: "Project Layout"
+    target_phrase: "endpoints"
+    severity: "medium"

@@ -1,0 +1,32 @@
+# config/org-dossier.yaml
+# Org-level context for the temporal simulator.
+# Provides company stage, strategic priorities, and stage-specific cadence modifiers.
+# The simulator uses this to:
+#   1. Adjust event frequency via stage_modifiers (third multiplier layer)
+#   2. Inject strategic context into LLM prompts (event content/themes)
+
+org:
+  company_stage: growth        # startup | growth | enterprise
+  headcount_band: 50-200
+  team_count: 3
+  industry: technology
+
+  strategic_context:
+    - "Scaling platform reliability after rapid growth"
+    - "Preparing for SOC2 certification"
+
+  # Org-stage cadence modifiers — applied as a third multiplier layer
+  # effective = role_variant × scenario × org_stage
+  stage_modifiers:
+    startup:
+      one_on_one: 1.3
+      status_report: 0.5
+      decision: 1.5
+      okr_update: 0.7
+      incident: 1.3
+    growth: {}
+    enterprise:
+      status_report: 1.8
+      decision: 0.7
+      one_on_one: 0.8
+      review_cycle: 1.3

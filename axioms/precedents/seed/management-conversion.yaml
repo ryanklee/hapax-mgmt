@@ -1,0 +1,19 @@
+# Precedent documenting the management total conversion decision
+- id: sp-conv-001
+  axiom_id: management_safety
+  date: "2026-03-06"
+  context: >
+    System converted from personal executive function platform to
+    purpose-built management support system. management_governance
+    elevated from domain axiom (weight 85) to constitutional axiom
+    management_safety (weight 95). The boundary "LLMs prepare, humans
+    deliver" is now the product's core safety specification.
+  decision: >
+    All non-management agents, collectors, routes, and frontend
+    components removed. 4 axioms converted: single_user -> single_operator,
+    executive_function -> decision_support, management_governance ->
+    management_safety (elevated), corporate_boundary -> dormant.
+  implication_ids:
+    - mg-boundary-001
+    - mg-boundary-002
+  status: approved

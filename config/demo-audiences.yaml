@@ -1,0 +1,168 @@
+audiences:
+  family member:
+    archetype: family
+    name: Family Member
+    context: |
+      A non-technical family member who knows the operator has been working on this system
+      but has no technical details about what it is or does.
+      They are not technical but are intellectually curious about systems thinking,
+      knowledge flow, partitioning, and agent dynamics at a conceptual level —
+      NOT about specific technologies (Docker, LiteLLM, etc.).
+
+      Their interests in this demo:
+      - The genuine uniqueness of this system in the LLM space
+      - How it helps the operator at work
+      - The nuanced knowledge systems that underlie the architecture
+      - Systems design thinking and systems thinking (knowledge flow, partitioning, agent dynamics)
+      - How it helps the operator connect with and understand people
+      - How it might help the operator achieve balance in life and achieve goals more effectively
+
+      Setting: Casual, personal, intimate.
+      Relationship: Family — they care about the operator, not the technology.
+    calibration:
+      emphasize:
+        - START with the big picture — what this is as a whole, before any details
+        - life organization, domain balance (work/personal/health/relationships), and achieving goals
+        - connecting with and understanding people — management tools that support being a better partner, parent, and leader
+        - neurodivergent-friendly design patterns — practical daily impact
+        - knowledge systems and information flow (conceptual, not technical)
+        - the distinction between what LLMs already do (chat, answer questions) and what the operator built on top (agents, self-monitoring, profile learning, management support)
+        - personal growth, family impact, and freeing cognitive energy for relationships
+        - systems thinking and agent dynamics (conceptual)
+        - the Obsidian notes app as "external brain" — agents write briefings and prep docs into it, it syncs across devices, and the system reads back from it to answer questions
+      skip:
+        - specific technology names (Docker, LiteLLM, Qdrant, etc.)
+        - infrastructure details (ports, containers, APIs)
+        - code and implementation specifics
+        - cost metrics, token counts, spending data — too complicated for casual demo
+        - system health scores and uptime numbers — this is background plumbing, not the point
+        - self-healing and maintenance as a feature — it's infrastructure, mention once briefly at most
+      forbidden_terms:
+        - Docker
+        - container
+        - LiteLLM
+        - Qdrant
+        - PostgreSQL
+        - pgvector
+        - Langfuse
+        - Ollama
+        - API
+        - endpoint
+        - microservice
+        - systemd
+        - VRAM
+        - GPU
+        - inference
+        - latency
+        - cost
+        - spending
+        - tokens
+        - uptime
+      never:
+        - use a teachy or didactic tone about neurodivergence
+        - fabricate specific daily routines or habits
+        - claim reliability ("hasn't given me trouble") — the system is under active development
+        - dwell on system health monitoring or self-healing — mention it once as background reliability, not as a selling point
+        - mention cost, spending, or money — it's too complicated for this context
+
+  operator:
+    archetype: technical-peer
+    name: Operator
+    context: |
+      The operator is the person who built this system. This is a self-review
+      demo: the operator is evaluating the demo pipeline's output quality AND getting a current
+      overview of the management cockpit's feature set, functionality, and operational state.
+
+      Dual purpose:
+      1. Demo quality review: Is the pipeline producing coherent, accurate, well-paced
+         output? Are slides clear? Is narration natural? Does the flow make sense?
+         The operator will be judging the demo system itself, not learning about it.
+      2. System overview: What's actually working right now? What agents are ported?
+         What does the dashboard show? What's the demo data corpus? What's the
+         bootstrap pipeline? What's the reactive engine doing?
+
+      The operator knows everything about the architecture — they built it. Don't explain
+      concepts. Show what's there, show what works, show what's missing. Be direct
+      and complete. This is an internal systems review, not a presentation.
+
+      Setting: Solo at the workstation. Working session, not a show.
+      Relationship: Operator reviewing their own system.
+    calibration:
+      emphasize:
+        - current state of all 15 ported agents — what each does, whether it's tested
+        - demo data corpus — what's seeded, what states it produces
+        - bootstrap pipeline — the hydration sequence and what it exercises
+        - cockpit API — endpoints, data collectors, nudge categories
+        - reactive engine — watcher, rules, executor, delivery
+        - dashboard panels — what's rendered, what data flows in
+        - axiom governance — the 3 active axioms and their enforcement
+        - management safety boundary — what the system won't do
+        - infrastructure isolation — separate ports, Qdrant, LiteLLM from wider system
+        - what's NOT done yet — gaps, missing features, known issues
+      skip: []
+      forbidden_terms: []
+      never:
+        - explain what anything is at a conceptual level — the operator built it
+        - pitch or sell — this is internal review
+        - hide gaps or limitations — surface them explicitly
+        - fabricate metrics or state — show real data only
+
+  jordan rivera:
+    archetype: leadership
+    name: Jordan
+    context: |
+      Jordan Rivera is a Staff Engineer at the same company where the operator
+      works. Jordan has extraordinarily broad and deep expertise: cloud architecture, containerization,
+      security, networking, governance, strategy — seemingly everything. They are brilliant
+      and make for a very difficult, high-bar audience. Nothing gets past them.
+
+      This is a cold introduction — Jordan knows nothing about this system. The operator
+      respects Jordan deeply and is seeking honest, critical technical feedback from
+      someone whose judgment they trust. The goal is for Jordan to evaluate the architecture
+      on its merits and provide candid assessment.
+
+      Jordan will care about:
+      - Architectural soundness: Is the service topology well-designed? Are boundaries clean?
+      - Security posture: Secrets management, network isolation, attack surface
+      - Containerization patterns: Docker Compose choices, resource management, health checks
+      - Observability: Tracing, logging, metrics — how mature is the telemetry?
+      - Data architecture: Vector DB design, embedding strategy, RAG pipeline patterns, Obsidian vault as bidirectional knowledge layer (vault_writer egress, RAG ingestion, GitDoc git-based sync)
+      - Integration patterns: API gateway, service mesh, model routing, fallback chains
+      - Operational maturity: Automated maintenance, self-healing, deployment patterns
+      - Cost governance: Model selection, local vs cloud tradeoffs, spend tracking
+      - Governance framework: Axiom system, constraint enforcement, drift detection
+      - Scalability considerations: What scales, what doesn't, and why that's fine (single-user)
+
+      Jordan will immediately spot:
+      - Any hand-waving or vague claims without architectural backing
+      - Security gaps or questionable trust boundaries
+      - Over-engineering or under-engineering relative to the problem space
+      - Whether design decisions are principled or accidental
+
+      Setting: Professional but collegial. The operator sharing a personal project with a
+      respected peer whose feedback genuinely matters.
+      Relationship: The operator seeks peer review from Jordan, not approval.
+    calibration:
+      emphasize:
+        - service topology and container orchestration
+        - security architecture and threat model
+        - observability and tracing stack
+        - data architecture and vector storage
+        - model routing and cost governance
+        - governance framework and drift detection
+        - self-regulation and autonomous maintenance patterns
+        - agent architecture and orchestration model
+        - operational cadence and scheduling
+        - honest limitations and tradeoffs
+      skip:
+        - personal context and neurodivergence details (mention briefly as motivation, don't dwell)
+        - music production domain
+        - management domain internals (people data, 1:1 prep content)
+        - basic explanations of technologies Jordan already knows deeply
+      never:
+        - explain what Docker, Kubernetes, or cloud platforms do — Jordan knows more than the system does
+        - pitch or sell — Jordan will see through it instantly and lose respect
+        - claim enterprise-grade when it's a single-user personal system
+        - hide limitations — Jordan respects honesty about tradeoffs more than polished surfaces
+        - use buzzwords without substance behind them
+        - fabricate performance metrics, uptime stats, or cost numbers

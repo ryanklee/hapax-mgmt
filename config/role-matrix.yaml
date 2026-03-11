@@ -1,0 +1,122 @@
+# config/role-matrix.yaml
+# Role definitions for the temporal simulator.
+# Each role defines which workflows it uses and available variants.
+
+roles:
+  engineering-manager:
+    description: "Engineering manager across experience levels"
+    variants:
+      new-em:
+        description: "First 90 days as EM — learning, observing, building relationships"
+        cadence_modifiers:
+          one_on_one: 1.5      # more frequent initial 1:1s
+          coaching_note: 0.5   # fewer coaching notes while learning
+          decision: 0.3        # fewer decisions while observing
+          feedback: 0.5        # cautious with feedback early on
+
+      experienced-em:
+        description: "Steady-state EM — full workflow usage"
+        cadence_modifiers: {}  # baseline cadences from workflow-semantics
+
+      senior-em:
+        description: "Multi-team EM — delegation-heavy, strategic focus"
+        cadence_modifiers:
+          status_report: 2.0   # more reporting
+          decision: 1.5        # more decisions
+          one_on_one: 0.7      # some delegated to leads
+
+    workflows:
+      - one_on_one
+      - coaching_note
+      - feedback
+      - okr_update
+      - goal
+      - incident
+      - postmortem_action
+      - review_cycle
+      - status_report
+      - decision
+
+    reference_distribution_30d:
+      one_on_one: [6, 16]
+      coaching_note: [2, 6]
+      feedback: [1, 5]
+      okr_update: [1, 4]
+      goal: [0, 3]
+      incident: [0, 2]
+      postmortem_action: [0, 3]
+      review_cycle: [0, 2]
+      status_report: [1, 4]
+      decision: [1, 4]
+
+  tech-lead:
+    description: "Technical leader — architecture decisions, incident response, technical mentorship"
+    variants:
+      baseline:
+        description: "Steady-state tech lead — balances technical and people work"
+        cadence_modifiers:
+          decision: 2.0
+          incident: 1.5
+          postmortem_action: 1.5
+          coaching_note: 1.5
+          status_report: 0.5
+          okr_update: 0.5
+          review_cycle: 0.5
+    workflows:
+      - one_on_one
+      - coaching_note
+      - feedback
+      - okr_update
+      - goal
+      - incident
+      - postmortem_action
+      - review_cycle
+      - status_report
+      - decision
+    reference_distribution_30d:
+      decision: [3, 8]
+      incident: [0, 3]
+      postmortem_action: [0, 4]
+      coaching_note: [1, 5]
+      one_on_one: [3, 8]
+      feedback: [0, 3]
+      okr_update: [0, 2]
+      goal: [0, 2]
+      review_cycle: [0, 1]
+      status_report: [0, 2]
+
+  vp-engineering:
+    description: "VP/Director — strategic oversight, upward reporting, org-level decisions"
+    variants:
+      baseline:
+        description: "Steady-state VP — operates through EMs, focuses on strategy and reporting"
+        cadence_modifiers:
+          status_report: 2.5
+          okr_update: 2.0
+          decision: 2.0
+          one_on_one: 0.5
+          coaching_note: 0.3
+          feedback: 0.3
+          incident: 0.7
+    workflows:
+      - one_on_one
+      - coaching_note
+      - feedback
+      - okr_update
+      - goal
+      - incident
+      - postmortem_action
+      - review_cycle
+      - status_report
+      - decision
+    reference_distribution_30d:
+      status_report: [4, 10]
+      okr_update: [3, 7]
+      decision: [3, 8]
+      one_on_one: [2, 6]
+      coaching_note: [0, 2]
+      feedback: [0, 2]
+      incident: [0, 2]
+      postmortem_action: [0, 2]
+      review_cycle: [0, 2]
+      goal: [0, 3]

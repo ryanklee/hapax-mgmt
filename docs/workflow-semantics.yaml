@@ -1,0 +1,93 @@
+# docs/workflow-semantics.yaml
+# Workflow semantics for the temporal simulator.
+# Consumed by the demo and simulator agents via the context assembly pipeline.
+# Kept current by the drift detector (weekly checks).
+
+workflows:
+  one_on_one:
+    data_type: meeting
+    subdirectory: meetings/
+    frontmatter:
+      type: meeting
+      meeting-type: one-on-one
+    triggers:
+      - coaching_note
+      - feedback
+    cadence: "per-person, configurable (weekly/biweekly/monthly)"
+    description: "Regular 1:1 meetings between manager and direct report"
+
+  coaching_note:
+    data_type: coaching
+    subdirectory: coaching/
+    frontmatter:
+      type: coaching
+    triggered_by: [one_on_one, incident]
+    cadence: "event-driven, typically after significant 1:1s or incidents"
+    description: "Coaching hypotheses and development observations"
+
+  feedback:
+    data_type: feedback
+    subdirectory: feedback/
+    frontmatter:
+      type: feedback
+    triggered_by: [one_on_one, review_cycle]
+    cadence: "monthly or event-driven"
+    description: "Feedback records (given/received, various categories)"
+
+  okr_update:
+    data_type: okr
+    subdirectory: okrs/
+    frontmatter:
+      type: okr
+    cadence: "quarterly definition, monthly check-in"
+    description: "Objectives and key results tracking"
+
+  goal:
+    data_type: goal
+    subdirectory: goals/
+    frontmatter:
+      type: goal
+    cadence: "quarterly definition, monthly progress update"
+    description: "Individual SMART development goals"
+
+  incident:
+    data_type: incident
+    subdirectory: incidents/
+    frontmatter:
+      type: incident
+    stochastic: true
+    triggers: [postmortem_action, coaching_note]
+    description: "Service incidents requiring management attention"
+
+  postmortem_action:
+    data_type: postmortem-action
+    subdirectory: postmortem-actions/
+    frontmatter:
+      type: postmortem-action
+    triggered_by: [incident]
+    description: "Action items from incident postmortems"
+
+  review_cycle:
+    data_type: review-cycle
+    subdirectory: review-cycles/
+    frontmatter:
+      type: review-cycle
+    cadence: "semi-annual or annual"
+    triggers: [feedback]
+    description: "Performance review process tracking"
+
+  status_report:
+    data_type: status-report
+    subdirectory: status-reports/
+    frontmatter:
+      type: status-report
+    cadence: "weekly or biweekly"
+    description: "Upward-facing status reports"
+
+  decision:
+    data_type: decision
+    subdirectory: decisions/
+    frontmatter:
+      type: decision
+    stochastic: true
+    description: "Architectural and organizational decisions"
