@@ -187,8 +187,8 @@ def scan_axiom_violations() -> list[DriftItem]:
 def scan_sufficiency_gaps() -> list[DriftItem]:
     """Run sufficiency probes and convert failures to DriftItems."""
     try:
-        from shared.sufficiency_probes import (
-            run_probes,  # type: ignore[import-not-found]  # optional module
+        from shared.sufficiency_probes import (  # type: ignore[reportMissingImports]
+            run_probes,
         )
     except ImportError:
         return []
