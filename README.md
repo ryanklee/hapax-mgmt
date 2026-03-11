@@ -2,7 +2,7 @@
 
 A management cockpit that demos itself — designed to be forked and grown into your own.
 
-Engineering management is high-context, high-stakes work where dropping a thread means a person feels unseen. This system exists because the developer who built it has ADHD — and the cognitive overhead of tracking 1:1 cadence, coaching follow-ups, feedback staleness, and open loops across a team was consuming capacity that should go toward the actual relational work of management.
+Engineering management is executive function work. Tracking 1:1 cadence, maintaining context across dozens of relationships, remembering coaching follow-ups, noticing feedback staleness, surfacing open loops — these are context processing and executive function tasks that every manager does at scale, and every manager struggles with at scale. The developer who built this has ADHD, which made the problem undeniable earlier — but the problem is management itself, not the diagnosis.
 
 hapax-officium is a decision support system for a single engineering manager. 16 LLM-powered agents prepare context for 1:1s, generate morning briefings, track management practice patterns, surface stale conversations, and profile the operator's management self-awareness across 6 dimensions. A reactive engine watches the filesystem for changes and cascades downstream work — nudge recalculation, cache refresh, LLM synthesis — without being asked.
 
