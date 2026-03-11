@@ -2,7 +2,7 @@
 
 A management cockpit for engineering managers. LLM-powered agents prepare context for 1:1s, track management practice patterns, surface stale conversations and open loops, and profile your management self-awareness -- so you walk into every conversation prepared, not scrambling. A React dashboard and FastAPI backend provide the operational interface.
 
-A management instantiation of the [hapax-core](https://github.com/ryanklee/hapax-core) pattern. See [hapax-council](https://github.com/ryanklee/hapax-council) for the full operational system.
+A management instantiation of the [hapax-constitution](https://github.com/ryanklee/hapax-constitution) pattern. See [hapax-council](https://github.com/ryanklee/hapax-council) for the full operational system.
 
 **Safety principle:** LLMs prepare, humans deliver. The system never generates feedback language, coaching recommendations, or evaluations of individual team members.
 
