@@ -7,34 +7,102 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
+
+concurrency:
+  group: auto-fix-${{ github.event.check_suite.head_branch }}
+  cancel-in-progress: true
 
 jobs:
   fix:
-    if: >
+    if: >-
       github.event.check_suite.conclusion == 'failure' &&
       github.event.check_suite.head_branch != 'main' &&
-      !startsWith(github.event.check_suite.head_branch, 'dependabot/')
+      !startsWith(github.event.check_suite.head_branch, 'dependabot/') &&
+      !contains(github.event.check_suite.head_commit.message, '[auto-fix]')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.check_suite.head_branch }}
-          fetch-depth: 0
-      - uses: anthropics/claude-code-action@beta
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          claude_args: "--model claude-sonnet-4-6 --max-turns 5 --allowedTools Read,Glob,Grep,Edit,Write,Bash"
-          prompt: |
-            The CI checks failed on this branch. Fix the issues.
+          fetch-depth: 20
 
-            Rules:
-            - Only fix lint errors (ruff), type errors (pyright), and test failures
-            - NEVER modify these files: axioms/*, shared/axiom_*.py, shared/config.py,
-              agents/system_check.py, .github/*, cockpit/engine/*
-            - Run `uv run ruff check --fix .` for lint issues
-            - Run `uv run pyright` to verify type fixes
-            - Run `uv run pytest` to verify test fixes
-            - Maximum 5 fix attempts per CI run (circuit breaker)
+      # Circuit breaker: max 3 auto-fix attempts per branch
+      - name: Check auto-fix attempt count
+        id: guard
+        run: |
+          COUNT=$(git log --oneline --grep='\[auto-fix\]' origin/main..HEAD | wc -l)
+          echo "auto_fix_count=$COUNT" >> "$GITHUB_OUTPUT"
+          if [ "$COUNT" -ge 3 ]; then
+            echo "::warning::Auto-fix limit reached ($COUNT attempts). Labeling for human review."
+            echo "should_fix=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_fix=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Label PR for human review
+        if: steps.guard.outputs.should_fix == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --head "${{ github.event.check_suite.head_branch }}" --json number --jq '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" --add-label "needs-human"
+          fi
+
+      - uses: astral-sh/setup-uv@v5
+        if: steps.guard.outputs.should_fix == 'true'
+
+      - name: Install dependencies
+        if: steps.guard.outputs.should_fix == 'true'
+        run: uv sync
+
+      # Run Claude Code CLI directly (claude-code-action doesn't support check_suite)
+      - name: Run Claude Code auto-fix
+        if: steps.guard.outputs.should_fix == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          npx -y @anthropic-ai/claude-code@latest --print \
+            --model claude-sonnet-4-6 \
+            --max-turns 5 \
+            --allowedTools Bash,Read,Edit,Write,Glob,Grep \
+            "The CI checks failed on this branch. Fix the issues.
+
+          Rules:
+          - Only fix lint errors (ruff), type errors (pyright), and format errors
+          - NEVER modify these files: axioms/*, shared/axiom_*.py, shared/config.py,
+            agents/system_check.py, .github/*, cockpit/engine/*
+          - Run \`uv run ruff check --fix .\` for lint issues
+          - Run \`uv run ruff format .\` for format issues
+          - Run \`uv run pyright\` to verify type fixes
+          - Make minimal changes — fix only what is broken
+
+          After fixing, verify all pass:
+          - \`uv run ruff check .\`
+          - \`uv run ruff format --check .\`
+          - \`uv run pyright\`"
+
+      # Commit and push the fix
+      - name: Commit auto-fix
+        if: steps.guard.outputs.should_fix == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "claude-code[bot]"
+          git config user.email "claude-code[bot]@users.noreply.github.com"
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit — Claude could not fix the issue."
+            PR_NUMBER=$(gh pr list --head "${{ github.event.check_suite.head_branch }}" --json number --jq '.[0].number')
+            if [ -n "$PR_NUMBER" ]; then
+              gh pr edit "$PR_NUMBER" --add-label "needs-human"
+            fi
+          else
+            git add -A
+            git commit -m "[auto-fix] resolve lint/typecheck/format errors
+
+          Automated fix by Claude Code. See CI logs for details.
+
+          Co-Authored-By: Claude Sonnet <noreply@anthropic.com>"
+            git push
+          fi
