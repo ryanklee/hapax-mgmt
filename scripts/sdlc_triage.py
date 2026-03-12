@@ -61,9 +61,7 @@ PROTECTED_PATHS = [
 
 
 def _build_system_prompt(axioms: list) -> str:
-    axiom_text = "\n".join(
-        f"- **{a.id}**: {a.text.strip()}" for a in axioms
-    )
+    axiom_text = "\n".join(f"- **{a.id}**: {a.text.strip()}" for a in axioms)
     return f"""\
 You are the triage agent for hapax-officium, a single-operator management \
 decision support system.
@@ -81,7 +79,7 @@ Your job is to classify a GitHub issue by type, complexity, and axiom relevance.
 ## Rejection Criteria (set reject_reason if any apply)
 - Complexity is L (too large for automated implementation).
 - Requirements are ambiguous or missing acceptance criteria.
-- Changes touch protected paths: {', '.join(PROTECTED_PATHS)}.
+- Changes touch protected paths: {", ".join(PROTECTED_PATHS)}.
 - Issue requires architectural decisions the operator should make.
 - Issues proposing to generate feedback language, coaching recommendations, \
 or performance evaluations about individuals must be REJECTED. The \
@@ -146,16 +144,82 @@ def _call_llm(system: str, user: str, *, dry_run: bool = False) -> TriageResult:
 # Similar-issue search
 # ---------------------------------------------------------------------------
 
-_TRIAGE_STOP_WORDS = frozenset([
-    "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
-    "have", "has", "had", "do", "does", "did", "will", "would", "could",
-    "should", "may", "might", "can", "shall", "to", "of", "in", "for",
-    "on", "with", "at", "by", "from", "as", "into", "through", "during",
-    "before", "after", "above", "below", "between", "out", "off", "over",
-    "under", "again", "further", "then", "once", "this", "that", "these",
-    "those", "it", "its", "not", "no", "nor", "and", "but", "or", "so",
-    "if", "when", "where", "how", "what", "which", "who", "whom", "why",
-])
+_TRIAGE_STOP_WORDS = frozenset(
+    [
+        "the",
+        "a",
+        "an",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "have",
+        "has",
+        "had",
+        "do",
+        "does",
+        "did",
+        "will",
+        "would",
+        "could",
+        "should",
+        "may",
+        "might",
+        "can",
+        "shall",
+        "to",
+        "of",
+        "in",
+        "for",
+        "on",
+        "with",
+        "at",
+        "by",
+        "from",
+        "as",
+        "into",
+        "through",
+        "during",
+        "before",
+        "after",
+        "above",
+        "below",
+        "between",
+        "out",
+        "off",
+        "over",
+        "under",
+        "again",
+        "further",
+        "then",
+        "once",
+        "this",
+        "that",
+        "these",
+        "those",
+        "it",
+        "its",
+        "not",
+        "no",
+        "nor",
+        "and",
+        "but",
+        "or",
+        "so",
+        "if",
+        "when",
+        "where",
+        "how",
+        "what",
+        "which",
+        "who",
+        "whom",
+        "why",
+    ]
+)
 
 
 def _extract_search_keywords(title: str, body: str, max_keywords: int = 5) -> list[str]:
@@ -193,6 +257,7 @@ def find_similar_closed(
     if not skip_github:
         try:
             from shared.sdlc_github import search_closed_issues
+
             query = " ".join(keywords[:4])
             gh_results = search_closed_issues(query, limit=5)
             for item in gh_results:
@@ -223,7 +288,9 @@ def _format_similar_issues(similar: list[dict]) -> str:
 # ---------------------------------------------------------------------------
 
 
-def run_triage(issue_number: int, *, dry_run: bool = False, skip_similar: bool = False) -> TriageResult:
+def run_triage(
+    issue_number: int, *, dry_run: bool = False, skip_similar: bool = False
+) -> TriageResult:
     """Triage a GitHub issue and return structured result."""
     issue = fetch_issue(issue_number)
     axioms = load_axioms(scope="constitutional")
@@ -249,6 +316,7 @@ def run_triage(issue_number: int, *, dry_run: bool = False, skip_similar: bool =
 
     try:
         from shared.sdlc_log import log_sdlc_event
+
         log_sdlc_event(
             "triage",
             issue_number=issue_number,
@@ -269,6 +337,7 @@ def run_triage(issue_number: int, *, dry_run: bool = False, skip_similar: bool =
 
     try:
         from shared.audit import log_audit
+
         log_audit(
             action="sdlc_triage",
             actor="sdlc_pipeline",
