@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   fix:
@@ -21,13 +22,10 @@ jobs:
         with:
           ref: ${{ github.event.check_suite.head_branch }}
           fetch-depth: 0
-      - uses: anthropics/claude-code-action@5d0cc745cd0cce4c0e9e0b3511de26c3bc285eb5
+      - uses: anthropics/claude-code-action@beta
         with:
-          model: claude-sonnet-4-6
-          max_turns: 5
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          timeout_minutes: 10
-          allowed_tools: "Read,Glob,Grep,Edit,Write,Bash"
+          claude_args: "--model claude-sonnet-4-6 --max-turns 5 --allowedTools Read,Glob,Grep,Edit,Write,Bash"
           prompt: |
             The CI checks failed on this branch. Fix the issues.
 
