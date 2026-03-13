@@ -8,7 +8,7 @@ Three tiers, one principle: Claude Code is the command center. Everything else i
 
 ### Internal fitness vs. external fitness
 
-The self-regulation agents (health-monitor, drift-detector, introspect) evaluate the system against its own expectations: is it healthy, is it consistent, is it documented? This is **internal fitness** — necessary but insufficient.
+The self-regulation agents (system-check, drift-detector, introspect) evaluate the system against its own expectations: is it healthy, is it consistent, is it documented? This is **internal fitness** — necessary but insufficient.
 
 **External fitness** asks a different question: given what exists in the wider landscape right now, is this still the right way to do things? Technology moves fast. The barrier to change is low. A component that was best-in-class six months ago may be obsolete today. The system must resist ossification by continuously evaluating itself against external alternatives — and when something better comes along with acceptable tradeoffs, adopt it, even if that means the operator's own workflows change.
 
@@ -35,18 +35,18 @@ This is the scout agent's purpose. Where the drift detector asks "does documenta
 │          Claude Code or CLI or n8n trigger            │
 │                                                      │
 │  Implemented:                                        │
-│    profiler         health-monitor   introspect      │
+│    profiler         system-check    introspect      │
 │    drift-detector   activity-analyzer briefing       │
 │    scout            management-prep  meeting-lifecycle│
 │    digest           knowledge-maint  ingest          │
 │    status-update    review-prep      demo            │
-│    system-check                                      │
+│    simulator                                         │
 ├──────────────────────────────────────────────────────┤
 │                TIER 3: AUTONOMOUS                     │
 │         Always-running systemd services or           │
 │          n8n scheduled workflows                     │
 │                                                      │
-│  rag-ingest       health-monitor timer                │
+│  rag-ingest       system-check timer                  │
 │  knowledge-maint  briefing timer                     │
 │  digest timer     scout timer                        │
 └──────────────────────────────────────────────────────┘
@@ -68,7 +68,7 @@ The **System Cockpit** is the operational dashboard, built as a **FastAPI API ba
 - `cockpit --once` produces a one-shot CLI snapshot for terminal use or piping
 - The React frontend connects to the FastAPI backend and renders the dashboard in the browser
 
-The cockpit consumes data from health-monitor, briefing, scout, activity-analyzer, and profiler agents. Persistent state lives in `profiles/` (probes, decisions, facts).
+The cockpit consumes data from system-check, briefing, scout, activity-analyzer, and profiler agents. Persistent state lives in `profiles/` (probes, decisions, facts).
 
 ### Extended Interactive Surfaces
 
@@ -140,12 +140,12 @@ These live in `agents/`. Each agent uses LiteLLM as its backend (never direct pr
 **Model:** claude-sonnet (balanced) for extraction.
 **Output:** `profiles/operator.json` (structured), `profiles/operator.md` (readable). Profile injected into all agent system prompts via `shared/operator.py`.
 
-### health-monitor
+### system-check
 
-**Trigger:** 15min timer (`health-monitor.timer`) or manual CLI.
-**Function:** Deterministic checks across 17 groups (docker, gpu, systemd, qdrant, profiles, endpoints, credentials, disk, models, auth, connectivity, queues, budget, capacity, axioms, latency, secrets). Zero LLM calls. 75 checks total. Auto-fix for safe issues (restart containers, clear caches). History appended to `profiles/health-history.jsonl`. `--history` flag for trend analysis.
+**Trigger:** Manual CLI or timer.
+**Function:** Minimal health checks across core services (Qdrant, LiteLLM, Ollama, Docker containers, systemd timers). Zero LLM calls. Reports pass/fail per service with machine-readable JSON output.
 **Model:** None (fully deterministic).
-**Output:** JSON health report + desktop/ntfy notifications on failure.
+**Output:** JSON health report to stdout.
 
 ### introspect
 
@@ -205,10 +205,10 @@ These live in `agents/`. Each agent uses LiteLLM as its backend (never direct pr
 
 **Behavior:** Watches a configured source directory via inotify/watchdog. New files → Docling extraction → chunk → nomic-embed-text → Qdrant `documents` collection. Handles PDF, DOCX, MD, HTML, TXT.
 
-### health-monitor timer (systemd timer)
+### system-check timer (systemd timer)
 
-**Behavior:** Every 15 minutes, invokes the health-monitor agent (Tier 2). Runs deterministic checks across 17 groups, auto-fixes safe issues, notifies via ntfy + desktop on failures. History appended to `profiles/health-history.jsonl`. Uses `health-watchdog.service` with `notify-failure@.service` template on failure.
-**Service:** `~/.config/systemd/user/health-monitor.timer` + `health-watchdog.service`
+**Behavior:** Periodic invocation of the system-check agent (Tier 2). Runs deterministic checks across core services, reports results.
+**Service:** `~/.config/systemd/user/system-check.timer`
 
 ### knowledge-maint (systemd timer)
 
@@ -250,7 +250,7 @@ ChangeEvent (watchdog/inotify) → RuleRegistry → ActionPlan → PhasedExecuto
 
 ## Implementation Status
 
-15 agents are implemented. All agents are within the management domain; no planned agents remain outside it.
+17 agents are implemented. All agents are within the management domain; no planned agents remain outside it.
 
 All Tier 3 services are running as systemd timers (not n8n). n8n is used for notification workflows (briefing-push, health-relay, nudge-digest, quick-capture) but not for agent scheduling.
 
@@ -312,6 +312,6 @@ The management cockpit uses `data/` (DATA_DIR) as its primary data store. All ma
 
 2. **State management:** Agents are stateless per-invocation. All persistent state lives in Qdrant, filesystem (`profiles/`), or cache (`profiles/`). This works well for the current 15-agent roster.
 
-3. **Cost controls:** LiteLLM fallback chains provide implicit cost control (expensive model fails → cheaper model). Langfuse traces all calls for cost visibility. High-frequency Tier 3 tasks (health-monitor, knowledge-maint) use zero LLM by default.
+3. **Cost controls:** LiteLLM fallback chains provide implicit cost control (expensive model fails → cheaper model). Langfuse traces all calls for cost visibility. High-frequency Tier 3 tasks (system-check, knowledge-maint) use zero LLM by default.
 
 4. **Adoption automation:** Operator confirms all adopt recommendations. No auto-apply.
