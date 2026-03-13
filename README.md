@@ -6,7 +6,7 @@ A management decision support system for a single engineering manager, designed 
 
 Engineering management is executive function work at scale. Tracking 1:1 cadence across a team, maintaining context for each person's growth trajectory, remembering coaching follow-ups, noticing when feedback has gone stale, surfacing open loops before they become dropped balls — these are context processing tasks that every manager performs and every manager struggles with as the team grows. They produce no deliverables, resist tooling (the state lives in the manager's head), and compound silently when neglected.
 
-hapax-officium externalizes this work into infrastructure. 16 agents prepare context for 1:1s, generate morning briefings, track management practice patterns, surface stale conversations, and profile the operator's management self-awareness across 6 dimensions. A reactive engine watches the filesystem for changes and cascades downstream work — nudge recalculation, cache refresh, LLM synthesis — without being asked.
+hapax-officium externalizes this work into infrastructure. 17 agents prepare context for 1:1s, generate morning briefings, track management practice patterns, surface stale conversations, and profile the operator's management self-awareness across 6 dimensions. A reactive engine watches the filesystem for changes and cascades downstream work — nudge recalculation, cache refresh, LLM synthesis — without being asked.
 
 **Safety principle.** LLMs prepare context; humans deliver words to other humans. The system never generates feedback language, coaching recommendations, or evaluations of individual team members. This boundary is enforced as a constitutional axiom with commit-time hooks — structural enforcement, not a prompt instruction.
 
@@ -26,7 +26,7 @@ This copies a synthetic seed corpus (3 teams, 8 people, full management state) i
 
 The demo agent profiles the audience (who are you presenting to?), generates a tailored demonstration against the live system, and the demo_eval agent critiques and iterates on the result.
 
-The system also introspects: `health_monitor` checks itself every 15 minutes and auto-fixes what it can. `knowledge_maint` prunes its own knowledge base for staleness and near-duplicates.
+The system also introspects: `system_check` runs health checks across core services, and `knowledge_maint` prunes its own knowledge base for staleness and near-duplicates.
 
 ## Architecture
 
@@ -65,6 +65,7 @@ Each axiom produces derived implications — concrete constraints like "error me
 | `review_prep` | Yes | Performance review evidence aggregation |
 | `demo` | Yes | Audience-tailored system demonstrations |
 | `demo_eval` | Yes | Demo critique and iterative improvement |
+| `simulator` | Yes | Temporal simulation of management scenarios |
 | `system_check` | No | Health checks for core services |
 
 ```bash
@@ -97,16 +98,16 @@ The cockpit requires three services:
 
 | Service | Purpose | Default |
 |---------|---------|---------|
-| Qdrant | Vector DB (768d nomic-embed-text) | localhost:6333 |
-| LiteLLM | LLM gateway with model routing and tracing | localhost:4000 |
+| Qdrant | Vector DB (768d nomic-embed-text) | localhost:6433 |
+| LiteLLM | LLM gateway with model routing and tracing | localhost:4100 |
 | Ollama | Local inference (embeddings, optional chat) | localhost:11434 |
 
 ## Project structure
 
 ```
 hapax-officium/
-├── agents/           16 agents + demo_pipeline package
-├── shared/           25 shared modules (config, data bridge, profile, axioms, frontmatter)
+├── agents/           17 agents + 2 agent packages (demo_pipeline, simulator_pipeline)
+├── shared/           33 shared modules (config, data bridge, profile, axioms, frontmatter)
 ├── cockpit/          FastAPI API (32 endpoints) + 11 data collectors + reactive engine
 ├── data/             Management state directory — the filesystem bus (gitignored contents)
 ├── demo-data/        Synthetic seed corpus (checked in)
