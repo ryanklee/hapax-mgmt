@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 hapax-officium/
 ├── CLAUDE.md                    # This file
-├── agents/                      # 16 agents (7 management + 5 system + 2 I/O + 2 demo)
+├── agents/                      # 17 agents (7 management + 6 system + 1 I/O + 2 demo + 1 simulation)
 │   ├── management_prep.py       # 1:1 prep, team snapshots, overviews
 │   ├── meeting_lifecycle.py     # Meeting automation, transcript processing
 │   ├── management_briefing.py   # Morning management briefing
@@ -33,7 +33,7 @@ hapax-officium/
 │   ├── demo_eval.py             # Demo evaluation and iterative improvement loop
 │   ├── system_check.py          # Health checks for 3 core services
 │   └── demo_pipeline/           # Demo generation pipeline (slides, charts, diagrams)
-├── shared/                      # 20 shared modules (config, notify, profile, axioms, etc.)
+├── shared/                      # 33 shared modules (config, notify, profile, axioms, etc.)
 ├── cockpit/                     # FastAPI API server (:8050) + data collectors + reactive engine
 │   ├── api/                     # REST server with 32 endpoints across 8 route groups
 │   ├── data/                    # 11 data collectors (management, nudges, team health, goals, etc.)
@@ -230,6 +230,7 @@ Configured in `shared/config.py` via env vars. Defaults:
 - Type hints mandatory. Pydantic models for structured data.
 - All LLM calls through LiteLLM proxy. Never direct to providers.
 - Git: conventional commits, feature branches from `main`.
+- **NEVER switch branches in the primary worktree.** The primary checkout (`~/projects/hapax-officium`) stays on `main`. For any feature branch, use `git worktree add ../hapax-officium--<branch-slug> <branch>`. This prevents concurrent Claude sessions from clobbering each other's state. When done, `git worktree remove`.
 - pydantic-ai: uses `output_type` (not `result_type`) and `result.output` (not `result.data`).
 - Tests use `unittest.mock` -- no pytest fixtures in conftest. Each test file is self-contained.
 - `asyncio_mode = "auto"` in pytest config -- async tests work without `@pytest.mark.asyncio`.
