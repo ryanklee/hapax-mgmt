@@ -9,10 +9,10 @@ from pathlib import Path
 import pytest
 
 try:
-    import imageio_ffmpeg  # noqa: F401
+    import imageio_ffmpeg
 
-    _HAS_FFMPEG = True
-except ModuleNotFoundError:
+    _HAS_FFMPEG = bool(imageio_ffmpeg.get_ffmpeg_exe())
+except (ModuleNotFoundError, RuntimeError):
     _HAS_FFMPEG = False
 
 pytestmark = pytest.mark.skipif(not _HAS_FFMPEG, reason="imageio_ffmpeg not installed")
