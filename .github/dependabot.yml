@@ -8,11 +8,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "npm"
+  - package-ecosystem: "pnpm"
     directory: "/officium-web"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "npm"
+  - package-ecosystem: "pnpm"
     directory: "/vscode"
     schedule:
       interval: "weekly"
