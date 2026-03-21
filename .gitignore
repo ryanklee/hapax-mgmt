@@ -62,3 +62,9 @@ dist/
 .coverage
 htmlcov/
 coverage/
+
+# Database
+*.db
+*.sqlite
+*.db-wal
+*.db-shm
