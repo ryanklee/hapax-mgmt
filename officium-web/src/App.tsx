@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
+import { TerrainPage } from "./pages/TerrainPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { DemosPage } from "./pages/DemosPage";
 
@@ -8,7 +9,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<DashboardPage />} />
+          <Route index element={<TerrainPage />} />
+          <Route path="legacy" element={<DashboardPage />} />
           <Route path="demos" element={<DemosPage />} />
         </Route>
       </Routes>
