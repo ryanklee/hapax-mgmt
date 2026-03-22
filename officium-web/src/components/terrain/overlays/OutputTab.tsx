@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useAgentRun } from "../../../contexts/AgentRunContext";
+import { useAgentRun } from "../../../hooks/useAgentRun";
 
 function lineColor(line: string): string {
   if (line.startsWith("---")) return "text-zinc-500 font-medium";
@@ -24,10 +24,8 @@ export function OutputTab() {
 
   // Elapsed timer
   useEffect(() => {
-    if (!isRunning || !startedAt) {
-      setElapsed(0);
-      return;
-    }
+    if (!isRunning || !startedAt) return;
+    setElapsed(Math.floor((Date.now() - startedAt) / 1000));
     const id = setInterval(() => {
       setElapsed(Math.floor((Date.now() - startedAt) / 1000));
     }, 1000);

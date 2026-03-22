@@ -34,6 +34,11 @@ export function useStimmung(): Record<RegionName, StimmungStance> {
   const { data: reviews } = useReviewCycles();
   const { data: statusReports } = useStatusReports();
 
+  // Briefing age computed outside memo (Date.now() is impure)
+  const briefingAgeHours = briefing?.generated_at
+    ? (Date.now() - new Date(briefing.generated_at).getTime()) / 3_600_000
+    : 48;
+
   return useMemo(() => {
     // Assembly: team health pressure
     const stale1on1s = mgmt?.people?.filter((p) => p.stale_1on1).length ?? 0;
@@ -47,11 +52,8 @@ export function useStimmung(): Record<RegionName, StimmungStance> {
     const criticalNudges = nudges?.filter(
       (n) => n.priority_label === "critical" || n.priority_label === "high",
     ).length ?? 0;
-    const briefingAge = briefing?.generated_at
-      ? (Date.now() - new Date(briefing.generated_at).getTime()) / 3_600_000
-      : 48;
     const outlookPressure = clamp01(
-      atRiskOKRs * 0.2 + staleGoals * 0.1 + criticalNudges * 0.15 + (briefingAge > 24 ? 0.3 : 0),
+      atRiskOKRs * 0.2 + staleGoals * 0.1 + criticalNudges * 0.15 + (briefingAgeHours > 24 ? 0.3 : 0),
     );
 
     // Cadence: process pressure
@@ -75,5 +77,5 @@ export function useStimmung(): Record<RegionName, StimmungStance> {
       chronicle: stanceFromPressure(chroniclePressure),
       foundation: "nominal" as StimmungStance,
     };
-  }, [mgmt, nudges, okrs, goals, briefing, incidents, postmortems, reviews, statusReports]);
+  }, [mgmt, nudges, okrs, goals, briefingAgeHours, incidents, postmortems, reviews, statusReports]);
 }

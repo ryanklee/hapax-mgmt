@@ -1,7 +1,7 @@
 import { Region } from "../Region";
 import { useAgents, useCycleMode } from "../../../api/hooks";
 import { AgentGrid } from "../../dashboard/AgentGrid";
-import { useAgentRun } from "../../../contexts/AgentRunContext";
+import { useAgentRun } from "../../../hooks/useAgentRun";
 import type { StimmungStance } from "../types";
 import type { AgentInfo } from "../../../api/types";
 

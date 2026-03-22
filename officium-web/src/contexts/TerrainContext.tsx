@@ -1,15 +1,15 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useMemo, useState, type ReactNode } from "react";
 import type { Depth, InvestigationTab, Overlay, RegionName } from "../components/terrain/types";
 import { DEPTHS } from "../components/terrain/types";
 
-interface TerrainDisplayValue {
+export interface TerrainDisplayValue {
   focusedRegion: RegionName | null;
   regionDepths: Record<RegionName, Depth>;
   activeOverlay: Overlay;
   investigationTab: InvestigationTab;
 }
 
-interface TerrainActionValue {
+export interface TerrainActionValue {
   focusRegion: (region: RegionName | null) => void;
   setRegionDepth: (region: RegionName, depth: Depth) => void;
   cycleDepth: (region: RegionName) => void;
@@ -17,8 +17,8 @@ interface TerrainActionValue {
   setInvestigationTab: (tab: InvestigationTab) => void;
 }
 
-const DisplayCtx = createContext<TerrainDisplayValue | null>(null);
-const ActionCtx = createContext<TerrainActionValue | null>(null);
+export const DisplayCtx = createContext<TerrainDisplayValue | null>(null);
+export const ActionCtx = createContext<TerrainActionValue | null>(null);
 
 const INITIAL_DEPTHS: Record<RegionName, Depth> = {
   outlook: "surface",
@@ -68,18 +68,5 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useTerrainDisplay(): TerrainDisplayValue {
-  const ctx = useContext(DisplayCtx);
-  if (!ctx) throw new Error("useTerrainDisplay must be used within TerrainProvider");
-  return ctx;
-}
 
-export function useTerrainActions(): TerrainActionValue {
-  const ctx = useContext(ActionCtx);
-  if (!ctx) throw new Error("useTerrainActions must be used within TerrainProvider");
-  return ctx;
-}
 
-export function useTerrain(): TerrainDisplayValue & TerrainActionValue {
-  return { ...useTerrainDisplay(), ...useTerrainActions() };
-}

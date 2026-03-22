@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { useTerrainDisplay, useTerrainActions } from "../../contexts/TerrainContext";
+import { useTerrainDisplay, useTerrainActions } from "../../hooks/useTerrain";
 import { useStimmung } from "../../hooks/useStimmung";
 import { OutlookRegion } from "./regions/OutlookRegion";
 import { AssemblyRegion } from "./regions/AssemblyRegion";
@@ -14,7 +14,7 @@ import { REGION_KEYS } from "./types";
 const MIDDLE_REGIONS: RegionName[] = ["assembly", "cadence", "chronicle"];
 
 function useGridStyles() {
-  const { regionDepths, focusedRegion } = useTerrainDisplay();
+  const { regionDepths } = useTerrainDisplay();
   const outlookExpanded = regionDepths.outlook !== "surface";
   const foundationExpanded = regionDepths.foundation !== "surface";
   const coreMiddle = MIDDLE_REGIONS.find((r) => regionDepths[r] === "core") ?? null;

@@ -1,5 +1,5 @@
 import { useCallback, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
-import { useTerrain } from "../../contexts/TerrainContext";
+import { useTerrain } from "../../hooks/useTerrain";
 import type { Depth, RegionName, StimmungStance } from "./types";
 import { DEPTHS } from "./types";
 
@@ -45,7 +45,7 @@ const DEPTH_GLOW: Record<Depth, string> = {
 };
 
 export function Region({ name, children, className = "", style, stimmungStance }: RegionProps) {
-  const { regionDepths, focusedRegion, cycleDepth, focusRegion, setRegionDepth } = useTerrain();
+  const { regionDepths, focusedRegion, cycleDepth, focusRegion } = useTerrain();
   const depth = regionDepths[name];
   const isFocused = focusedRegion === name;
   const [isHovered, setIsHovered] = useState(false);

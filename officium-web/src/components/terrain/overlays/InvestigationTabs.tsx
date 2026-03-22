@@ -1,4 +1,4 @@
-import { useTerrainDisplay, useTerrainActions } from "../../../contexts/TerrainContext";
+import { useTerrainDisplay, useTerrainActions } from "../../../hooks/useTerrain";
 import type { InvestigationTab } from "../types";
 import { INVESTIGATION_TABS } from "../types";
 import { ChatTab } from "./ChatTab";

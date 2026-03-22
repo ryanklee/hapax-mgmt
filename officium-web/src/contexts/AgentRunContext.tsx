@@ -1,9 +1,9 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useMemo, useState, type ReactNode } from "react";
 import { useSSE } from "../hooks/useSSE";
-import { useTerrainActions } from "./TerrainContext";
+import { useTerrainActions } from "../hooks/useTerrain";
 import type { AgentInfo } from "../api/types";
 
-interface AgentRunState {
+export interface AgentRunState {
   lines: string[];
   isRunning: boolean;
   error: string | null;
@@ -14,7 +14,7 @@ interface AgentRunState {
   clearOutput: () => void;
 }
 
-const AgentRunCtx = createContext<AgentRunState | null>(null);
+export const AgentRunCtx = createContext<AgentRunState | null>(null);
 
 export function AgentRunProvider({ children }: { children: ReactNode }) {
   const sse = useSSE();
@@ -61,8 +61,3 @@ export function AgentRunProvider({ children }: { children: ReactNode }) {
   return <AgentRunCtx.Provider value={value}>{children}</AgentRunCtx.Provider>;
 }
 
-export function useAgentRun(): AgentRunState {
-  const ctx = useContext(AgentRunCtx);
-  if (!ctx) throw new Error("useAgentRun must be used within AgentRunProvider");
-  return ctx;
-}
