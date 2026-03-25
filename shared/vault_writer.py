@@ -14,6 +14,8 @@ from shared.config import config
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from shared.vault_schemas import VaultDocBase
+
 _log = logging.getLogger(__name__)
 
 _SLUG_RE = re.compile(r"[^a-zA-Z0-9_-]")
@@ -23,6 +25,8 @@ def _write_md(
     path: Path,
     content: str,
     frontmatter: dict | None = None,
+    *,
+    schema: type[VaultDocBase] | None = None,
 ) -> Path:
     """Write a markdown file with optional YAML frontmatter. Creates parent dirs.
 
@@ -32,6 +36,9 @@ def _write_md(
     data_root = config.data_dir.resolve()
     if not resolved.is_relative_to(data_root):
         raise ValueError(f"Path escapes DATA_DIR: {resolved}")
+
+    if frontmatter and schema is not None:
+        schema.model_validate(frontmatter)  # raises on bad data
 
     resolved.parent.mkdir(parents=True, exist_ok=True)
     parts: list[str] = []
